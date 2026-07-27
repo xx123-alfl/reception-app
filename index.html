@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>接待流程管理系统</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-light: #e8f0fe;
+    --success: #057a55;
+    --success-light: #e6f5ee;
+    --warning: #b45309;
+    --warning-light: #fef3c7;
+    --danger: #c81e1e;
+    --danger-light: #fde8e8;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,.08), 0 4px 10px rgba(0,0,0,.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #f1f5f9;
+    color: var(--gray-800);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Main */
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: white;
+    border-radius: var(--radius);
+    padding: 4px;
+    box-shadow: var(--shadow);
+    width: fit-content;
+  }
+  .tab {
+    padding: 10px 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: 9px;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab.active { background: var(--primary); color: white; }
+  .tab:hover:not(.active) { color: var(--gray-700); background: var(--gray-100); }
+  .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    padding: 0 6px;
+    margin-left: 6px;
+    background: rgba(255,255,255,.25);
+  }
+  .tab:not(.active) .tab-badge {
+    background: var(--gray-200);
+    color: var(--gray-600);
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-grid .full-width { grid-column: 1 / -1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .form-label .required { color: var(--danger); font-size: 16px; }
+  .form-input, .form-select, .form-textarea {
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color .2s, box-shadow .2s;
+    background: white;
+    color: var(--gray-800);
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .form-hint { font-size: 12px; color: var(--gray-400); }
+
+  /* Purpose checkboxes */
+  .purpose-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .purpose-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 2px solid var(--gray-300);
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--gray-600);
+    background: white;
+    transition: all .2s;
+    user-select: none;
+  }
+  .purpose-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .purpose-chip.selected {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .purpose-chip .chip-icon { font-size: 18px; }
+  .purpose-chip input { display: none; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: #1a4bc4; box-shadow: 0 2px 8px rgba(26,86,219,.3); }
+  .btn-success { background: var(--success); color: white; }
+  .btn-success:hover { background: #046c44; }
+  .btn-outline {
+    background: white;
+    color: var(--gray-700);
+    border: 1.5px solid var(--gray-300);
+  }
+  .btn-outline:hover { border-color: var(--gray-400); background: var(--gray-50); }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-xs { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-danger:hover { background: #b01a1a; }
+
+  /* Table */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--gray-50);
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+  }
+  td {
+    padding: 14px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+  }
+  tr:hover td { background: var(--gray-50); }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-draft { background: var(--gray-100); color: var(--gray-600); }
+  .badge-submitted { background: var(--warning-light); color: var(--warning); }
+  .badge-reviewed { background: var(--success-light); color: var(--success); }
+
+  /* Purpose tags */
+  .purpose-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--primary-light);
+    color: var(--primary);
+    margin: 1px 3px;
+    white-space: nowrap;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color .2s;
+  }
+  .search-box input:focus { outline: none; border-color: var(--primary); }
+  .search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 16px;
+  }
+  .filter-select {
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    cursor: pointer;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+  }
+  .empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; }
+  .empty-state p { font-size: 16px; margin-bottom: 4px; }
+  .empty-state .sub { font-size: 14px; color: var(--gray-300); }
+
+  /* Toast */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    padding: 14px 20px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn .3s ease;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast-success { background: #057a55; }
+  .toast-error { background: #c81e1e; }
+  .toast-info { background: var(--primary); }
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn .2s;
+  }
+  .modal {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 560px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+    animation: scaleIn .2s;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 16px; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(.95); } to { transform: scale(1); } }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--gray-800); }
+  .stat-label { font-size: 13px; color: var(--gray-500); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full-width { grid-column: 1; }
+    .toolbar { flex-direction: column; }
+    .search-box { min-width: auto; }
+    .header-inner { height: auto; padding: 12px 0; flex-wrap: wrap; gap: 8px; }
+  }
+
+  .text-muted { color: var(--gray-400); font-size: 13px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+
+  /* Print */
+  @media print {
+    .header, .tabs, .toolbar, .btn, .toast-container, .modal-overlay, .stats-row { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    body { background: white; }
+  }
+
+  .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📋</div>
+      接待流程管理系统
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" onclick="exportAllJSON()" title="导出全部数据为JSON备份">📥 导出备份</button>
+      <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+        📤 导入数据
+        <input type="file" accept=".json" onchange="importJSON(event)" style="display:none;">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('form')">
+      ✏️ 填写接待流程
+    </button>
+    <button class="tab" onclick="switchTab('records')">
+      📋 接待记录列表 <span class="tab-badge" id="recordCount">0</span>
+    </button>
+  </div>
+
+  <!-- Form Tab -->
+  <div id="tab-form">
+    <div class="card">
+      <div class="card-header">📝 新建接待流程方案</div>
+      <form id="receptionForm" onsubmit="saveRecord(event)">
+        <div class="form-grid">
+          <!-- A. 来访单位 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> A. 来访单位 / 推荐单位</label>
+            <input type="text" class="form-input" id="visitingUnit" required placeholder="请输入来访单位或推荐单位名称">
+          </div>
+
+          <!-- B. 来访人员最高职级 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> B. 来访人员最高职级</label>
+            <input type="text" class="form-input" id="highestRank" required placeholder="例如：厅长、局长、总经理、副总裁等">
+          </div>
+
+          <!-- C. 带队领导 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> C. 带队领导</label>
+            <input type="text" class="form-input" id="teamLeader" required placeholder="请输入带队领导姓名">
+          </div>
+
+          <!-- C. 团队人数 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> 团队人数</label>
+            <input type="number" class="form-input" id="teamSize" required min="1" max="500" placeholder="请输入团队总人数">
+          </div>
+
+          <!-- D. 来访目的（勾选） -->
+          <div class="form-group full-width">
+            <label class="form-label"><span class="required">*</span> D. 来访目的（可多选）</label>
+            <div class="purpose-group" id="purposeGroup">
+              <label class="purpose-chip" onclick="togglePurpose(this)">
+                <span class="chip-icon">🔬</span> 调研
+                <input type="checkbox" value="调研">
+              </label>
+              <label class="purpose-chip" onclick="togglePurpose(this)">
+                <span class="chip-icon">💼</span> 招商
+                <input type="checkbox" value="招商">
+              </label>
+              <label class="purpose-chip" onclick="togglePurpose(this)">
+                <span class="chip-icon">📅</span> 例行
+                <input type="checkbox" value="例行">
+              </label>
+              <label class="purpose-chip" onclick="togglePurpose(this)">
+                <span class="chip-icon">🤝</span> 企业交流
+                <input type="checkbox" value="企业交流">
+              </label>
+            </div>
+            <span class="form-hint">至少选择一个来访目的</span>
+          </div>
+
+          <!-- 来访日期 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> 计划来访日期</label>
+            <input type="date" class="form-input" id="visitDate" required>
+          </div>
+
+          <!-- 接待负责人 -->
+          <div class="form-group">
+            <label class="form-label"><span class="required">*</span> 我方接待负责人</label>
+            <input type="text" class="form-input" id="receptionHost" required placeholder="请输入我方接待负责人姓名">
+          </div>
+
+          <!-- 状态 -->
+          <div class="form-group" id="statusGroup" style="display:none;">
+            <label class="form-label">审批状态</label>
+            <select class="form-select" id="status">
+              <option value="draft">📝 草稿</option>
+              <option value="submitted">📤 已提交</option>
+              <option value="reviewed">✅ 已审核</option>
+            </select>
+          </div>
+
+          <!-- 接待议程 -->
+          <div class="form-group full-width">
+            <label class="form-label">接待议程安排</label>
+            <textarea class="form-textarea" id="agenda" placeholder="请填写详细的接待议程安排，例如：
+09:30 - 10:00  来访人员到达，一楼大厅迎接
+10:00 - 10:30  参观展厅/企业介绍
+10:30 - 11:30  会议室座谈交流
+11:30 - 13:00  工作午餐
+..."></textarea>
+          </div>
+
+          <!-- 备注 -->
+          <div class="form-group full-width">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" id="notes" placeholder="其他需要说明的事项..."></textarea>
+          </div>
+
+          <!-- 隐藏字段 -->
+          <input type="hidden" id="editId">
+
+          <!-- 按钮 -->
+          <div class="form-group full-width" style="flex-direction: row; gap: 12px;">
+            <button type="submit" class="btn btn-primary" id="submitBtn">💾 保存接待流程</button>
+            <button type="button" class="btn btn-outline" onclick="resetForm()">🔄 清空表单</button>
+            <span style="color: var(--gray-400); font-size: 13px; align-self: center;" id="formMode"></span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Records Tab -->
+  <div id="tab-records" style="display:none;">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e8f0fe;">📋</div>
+        <div><div class="stat-num" id="statTotal">0</div><div class="stat-label">全部记录</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6f5ee;">✅</div>
+        <div><div class="stat-num" id="statReviewed">0</div><div class="stat-label">已审核</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fef3c7;">📤</div>
+        <div><div class="stat-num" id="statSubmitted">0</div><div class="stat-label">待审核</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f3f4f6;">📝</div>
+        <div><div class="stat-num" id="statDraft">0</div><div class="stat-label">草稿</div></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:600;">📋 接待记录列表</div>
+        <button class="btn btn-success btn-sm" onclick="switchTab('form')">➕ 新建接待流程</button>
+      </div>
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜索来访单位、带队领导、接待负责人..." oninput="renderRecords()">
+        </div>
+        <select class="filter-select" id="filterPurpose" onchange="renderRecords()">
+          <option value="">全部目的</option>
+          <option value="调研">调研</option>
+          <option value="招商">招商</option>
+          <option value="例行">例行</option>
+          <option value="企业交流">企业交流</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="renderRecords()">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="submitted">待审核</option>
+          <option value="reviewed">已审核</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">🔄 清除筛选</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>来访单位</th>
+              <th>最高职级</th>
+              <th>带队领导</th>
+              <th>人数</th>
+              <th>来访目的</th>
+              <th>计划日期</th>
+              <th>接待负责人</th>
+              <th>状态</th>
+              <th>更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTableBody">
+            <tr>
+              <td colspan="10">
+                <div class="empty-state">
+                  <div class="empty-icon">📭</div>
+                  <p>暂无接待记录</p>
+                  <p class="sub">点击上方"新建接待流程"按钮开始填写</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ==================== DATA LAYER ====================
+const STORAGE_KEY = 'reception_records';
+
+function getRecords() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch { return []; }
+}
+
+function saveRecords(records) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+}
+
+// ==================== TOAST ====================
+function toast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  t.innerHTML = `<span>${icons[type]||'📢'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.animation = 'fadeOut .3s ease forwards';
+    setTimeout(() => t.remove(), 300);
+  }, 2500);
+}
+
+// ==================== FORM LOGIC ====================
+function togglePurpose(chip) {
+  const cb = chip.querySelector('input');
+  cb.checked = !cb.checked;
+  chip.classList.toggle('selected', cb.checked);
+}
+
+function getSelectedPurposes() {
+  return [...document.querySelectorAll('#purposeGroup input:checked')].map(cb => cb.value);
+}
+
+function setSelectedPurposes(purposes) {
+  document.querySelectorAll('#purposeGroup .purpose-chip').forEach(chip => {
+    const cb = chip.querySelector('input');
+    cb.checked = purposes.includes(cb.value);
+    chip.classList.toggle('selected', cb.checked);
+  });
+}
+
+function resetForm() {
+  document.getElementById('receptionForm').reset();
+  document.getElementById('editId').value = '';
+  document.getElementById('status').value = 'draft';
+  document.getElementById('statusGroup').style.display = 'none';
+  document.getElementById('submitBtn').textContent = '💾 保存接待流程';
+  document.getElementById('formMode').textContent = '';
+  setSelectedPurposes([]);
+}
+
+function editRecord(id) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+
+  switchTab('form');
+  document.getElementById('editId').value = r.id;
+  document.getElementById('visitingUnit').value = r.visitingUnit || '';
+  document.getElementById('highestRank').value = r.highestRank || '';
+  document.getElementById('teamLeader').value = r.teamLeader || '';
+  document.getElementById('teamSize').value = r.teamSize || '';
+  document.getElementById('visitDate').value = r.visitDate || '';
+  document.getElementById('receptionHost').value = r.receptionHost || '';
+  document.getElementById('agenda').value = r.agenda || '';
+  document.getElementById('notes').value = r.notes || '';
+  document.getElementById('status').value = r.status || 'draft';
+  document.getElementById('statusGroup').style.display = 'block';
+  document.getElementById('submitBtn').textContent = '✏️ 更新接待流程';
+  document.getElementById('formMode').textContent = `（正在编辑记录 #${r.id}）`;
+  setSelectedPurposes(r.purposes || []);
+
+  document.getElementById('visitingUnit').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function saveRecord(event) {
+  event.preventDefault();
+  const purposes = getSelectedPurposes();
+  if (purposes.length === 0) {
+    toast('请至少选择一个来访目的', 'error');
+    return;
+  }
+
+  const editId = document.getElementById('editId').value;
+  const records = getRecords();
+  const now = new Date().toISOString();
+
+  const record = {
+    id: editId || Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    visitingUnit: document.getElementById('visitingUnit').value.trim(),
+    highestRank: document.getElementById('highestRank').value.trim(),
+    teamLeader: document.getElementById('teamLeader').value.trim(),
+    teamSize: parseInt(document.getElementById('teamSize').value) || 0,
+    purposes: purposes,
+    visitDate: document.getElementById('visitDate').value,
+    receptionHost: document.getElementById('receptionHost').value.trim(),
+    agenda: document.getElementById('agenda').value.trim(),
+    notes: document.getElementById('notes').value.trim(),
+    status: document.getElementById('statusGroup').style.display !== 'none'
+      ? document.getElementById('status').value : 'draft',
+    createdAt: editId ? (records.find(r => r.id === editId)?.createdAt || now) : now,
+    updatedAt: now,
+  };
+
+  if (editId) {
+    const idx = records.findIndex(r => r.id === editId);
+    if (idx >= 0) records[idx] = record;
+    toast('✅ 接待流程已更新！');
+  } else {
+    records.unshift(record);
+    toast('✅ 接待流程已保存！');
+  }
+
+  saveRecords(records);
+  resetForm();
+  updateStats();
+  if (document.getElementById('tab-records').style.display !== 'none') {
+    renderRecords();
+  }
+}
+
+function deleteRecord(id) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+  if (!confirm(`确定要删除「${r.visitingUnit}」的接待记录吗？\n\n此操作不可恢复。`)) return;
+
+  const filtered = records.filter(r => r.id !== id);
+  saveRecords(filtered);
+  toast('🗑️ 记录已删除');
+  renderRecords();
+  updateStats();
+}
+
+function updateStatus(id, newStatus) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+  r.status = newStatus;
+  r.updatedAt = new Date().toISOString();
+  saveRecords(records);
+  const labels = { draft: '草稿', submitted: '已提交', reviewed: '已审核' };
+  toast(`状态已更新为：${labels[newStatus]}`);
+  renderRecords();
+  updateStats();
+}
+
+// ==================== RENDER ====================
+function renderRecords() {
+  let records = getRecords();
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const filterPurpose = document.getElementById('filterPurpose')?.value || '';
+  const filterStatus = document.getElementById('filterStatus')?.value || '';
+
+  if (search) {
+    records = records.filter(r =>
+      r.visitingUnit.toLowerCase().includes(search) ||
+      r.teamLeader.toLowerCase().includes(search) ||
+      r.receptionHost.toLowerCase().includes(search) ||
+      r.highestRank.toLowerCase().includes(search) ||
+      r.notes?.toLowerCase().includes(search)
+    );
+  }
+  if (filterPurpose) {
+    records = records.filter(r => r.purposes?.includes(filterPurpose));
+  }
+  if (filterStatus) {
+    records = records.filter(r => r.status === filterStatus);
+  }
+
+  const tbody = document.getElementById('recordsTableBody');
+  if (records.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>${search || filterPurpose || filterStatus ? '没有匹配的记录' : '暂无接待记录'}</p>
+        <p class="sub">${search || filterPurpose || filterStatus ? '请尝试调整筛选条件' : '点击上方"新建接待流程"按钮开始填写'}</p>
+      </div></td></tr>`;
+    return;
+  }
+
+  const statusLabels = { draft: '📝 草稿', submitted: '📤 已提交', reviewed: '✅ 已审核' };
+  const statusBadgeClass = { draft: 'badge-draft', submitted: 'badge-submitted', reviewed: 'badge-reviewed' };
+
+  tbody.innerHTML = records.map(r => `
+    <tr>
+      <td><strong>${esc(r.visitingUnit)}</strong></td>
+      <td>${esc(r.highestRank)}</td>
+      <td>${esc(r.teamLeader)}</td>
+      <td>${r.teamSize}人</td>
+      <td>${(r.purposes||[]).map(p => `<span class="purpose-tag">${esc(p)}</span>`).join(' ')}</td>
+      <td>${r.visitDate || '-'}</td>
+      <td>${esc(r.receptionHost)}</td>
+      <td><span class="badge ${statusBadgeClass[r.status] || 'badge-draft'}">${statusLabels[r.status] || r.status}</span></td>
+      <td class="text-muted">${fmtDate(r.updatedAt)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-outline btn-xs" onclick="viewDetail('${r.id}')" title="查看详情">👁</button>
+          <button class="btn btn-outline btn-xs" onclick="editRecord('${r.id}')" title="编辑">✏️</button>
+          <button class="btn btn-primary btn-xs" onclick="exportWord('${r.id}')" title="导出Word">📄</button>
+          ${r.status !== 'reviewed' ? `<button class="btn btn-success btn-xs" onclick="updateStatus('${r.id}','reviewed')" title="标记已审核">✅</button>` : ''}
+          ${r.status === 'draft' ? `<button class="btn btn-outline btn-xs" onclick="updateStatus('${r.id}','submitted')" title="提交审核">📤</button>` : ''}
+          <button class="btn btn-danger btn-xs" onclick="deleteRecord('${r.id}')" title="删除">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateStats() {
+  const records = getRecords();
+  document.getElementById('recordCount').textContent = records.length;
+  document.getElementById('statTotal').textContent = records.length;
+  document.getElementById('statReviewed').textContent = records.filter(r => r.status === 'reviewed').length;
+  document.getElementById('statSubmitted').textContent = records.filter(r => r.status === 'submitted').length;
+  document.getElementById('statDraft').textContent = records.filter(r => r.status === 'draft').length;
+}
+
+function clearFilters() {
+  const si = document.getElementById('searchInput');
+  const fp = document.getElementById('filterPurpose');
+  const fs = document.getElementById('filterStatus');
+  if (si) si.value = '';
+  if (fp) fp.value = '';
+  if (fs) fs.value = '';
+  renderRecords();
+}
+
+// ==================== DETAIL MODAL ====================
+function viewDetail(id) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+
+  const statusLabels = { draft: '📝 草稿', submitted: '📤 已提交', reviewed: '✅ 已审核' };
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <h3>📋 接待流程详情</h3>
+    <div style="display:grid;gap:14px;font-size:15px;">
+      <div><strong style="color:var(--gray-500);">A. 来访单位 / 推荐单位：</strong><br>${esc(r.visitingUnit)}</div>
+      <div><strong style="color:var(--gray-500);">B. 来访人员最高职级：</strong><br>${esc(r.highestRank)}</div>
+      <div><strong style="color:var(--gray-500);">C. 带队领导：</strong>${esc(r.teamLeader)} &nbsp;|&nbsp; <strong style="color:var(--gray-500);">团队人数：</strong>${r.teamSize}人</div>
+      <div><strong style="color:var(--gray-500);">D. 来访目的：</strong><br>${(r.purposes||[]).map(p => `<span class="purpose-tag" style="font-size:14px;">${esc(p)}</span>`).join(' ')}</div>
+      <div><strong style="color:var(--gray-500);">计划来访日期：</strong>${r.visitDate || '-'}</div>
+      <div><strong style="color:var(--gray-500);">我方接待负责人：</strong>${esc(r.receptionHost)}</div>
+      <div><strong style="color:var(--gray-500);">状态：</strong>${statusLabels[r.status] || r.status}</div>
+      ${r.agenda ? `<div style="background:var(--gray-50);padding:14px;border-radius:8px;"><strong style="color:var(--gray-500);">接待议程：</strong><br><pre style="white-space:pre-wrap;font-family:inherit;font-size:14px;margin-top:6px;">${esc(r.agenda)}</pre></div>` : ''}
+      ${r.notes ? `<div><strong style="color:var(--gray-500);">备注：</strong><br>${esc(r.notes)}</div>` : ''}
+      <div class="text-muted">创建时间：${fmtDateTime(r.createdAt)} | 更新时间：${fmtDateTime(r.updatedAt)}</div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-sm" onclick="editRecord('${r.id}');closeModal();">✏️ 编辑</button>
+      <button class="btn btn-primary btn-sm" onclick="exportWord('${r.id}')">📄 导出Word</button>
+      <button class="btn btn-outline btn-sm" onclick="printRecord('${r.id}')">🖨️ 打印</button>
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">关闭</button>
+    </div>
+  `;
+  document.getElementById('detailModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+
+function printRecord(id) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+  const w = window.open('', '_blank');
+  w.document.write(buildWordHTML(r));
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+
+// ==================== WORD EXPORT ====================
+function buildWordHTML(r) {
+  const statusLabels = { draft: '草稿', submitted: '已提交', reviewed: '已审核' };
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>接待流程方案</title>
+<style>
+  body { font-family: "SimSun", "宋体", serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 2; color: #000; }
+  h1 { text-align: center; font-size: 22px; margin-bottom: 30px; letter-spacing: 2px; }
+  .info { margin-bottom: 20px; }
+  .info-row { display: flex; border-bottom: 1px solid #ccc; padding: 8px 0; font-size: 15px; }
+  .info-label { width: 180px; font-weight: bold; flex-shrink: 0; }
+  .info-value { flex: 1; }
+  .section { margin-top: 24px; }
+  .section-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; border-left: 4px solid #1a56db; padding-left: 10px; }
+  .agenda-box { background: #f9fafb; padding: 16px; border: 1px solid #e5e7eb; white-space: pre-wrap; font-size: 14px; }
+  .footer { margin-top: 40px; display: flex; justify-content: space-between; }
+  .footer div { text-align: center; }
+  .footer .line { display: inline-block; width: 120px; border-bottom: 1px solid #000; margin-bottom: 6px; }
+  @media print { body { margin: 20px; } }
+</style></head>
+<body>
+  <h1>接 待 流 程 方 案</h1>
+  <div class="info">
+    <div class="info-row"><div class="info-label">A. 来访单位 / 推荐单位：</div><div class="info-value">${esc(r.visitingUnit)}</div></div>
+    <div class="info-row"><div class="info-label">B. 来访人员最高职级：</div><div class="info-value">${esc(r.highestRank)}</div></div>
+    <div class="info-row"><div class="info-label">C. 带队领导：</div><div class="info-value">${esc(r.teamLeader)}</div></div>
+    <div class="info-row"><div class="info-label">团队人数：</div><div class="info-value">${r.teamSize} 人</div></div>
+    <div class="info-row"><div class="info-label">D. 来访目的：</div><div class="info-value">${(r.purposes||[]).join('、')}</div></div>
+    <div class="info-row"><div class="info-label">计划来访日期：</div><div class="info-value">${r.visitDate || '（待定）'}</div></div>
+    <div class="info-row"><div class="info-label">我方接待负责人：</div><div class="info-value">${esc(r.receptionHost)}</div></div>
+  </div>
+  ${r.agenda ? `
+  <div class="section">
+    <div class="section-title">接待议程安排</div>
+    <div class="agenda-box">${esc(r.agenda)}</div>
+  </div>` : ''}
+  ${r.notes ? `
+  <div class="section">
+    <div class="section-title">备注</div>
+    <p>${esc(r.notes)}</p>
+  </div>` : ''}
+  <div class="footer">
+    <div><div class="line"></div><div>经办人</div></div>
+    <div><div class="line"></div><div>审核人</div></div>
+    <div><div class="line"></div><div>批准人</div></div>
+  </div>
+  <p style="text-align:center;color:#999;margin-top:30px;font-size:12px;">生成时间：${fmtDateTime(new Date().toISOString())} &nbsp;|&nbsp; 状态：${statusLabels[r.status] || r.status}</p>
+</body></html>`;
+}
+
+function exportWord(id) {
+  const records = getRecords();
+  const r = records.find(r => r.id === id);
+  if (!r) return;
+
+  const html = buildWordHTML(r);
+  const blob = new Blob([html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `接待流程_${r.visitingUnit}_${r.visitDate || '未定日期'}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('📄 Word文档已下载！');
+}
+
+// ==================== IMPORT / EXPORT JSON ====================
+function exportAllJSON() {
+  const records = getRecords();
+  const json = JSON.stringify(records, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `接待记录备份_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`📥 已导出 ${records.length} 条记录`);
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('数据格式错误');
+      const existing = getRecords();
+      const existingIds = new Set(existing.map(r => r.id));
+      let added = 0;
+      for (const r of data) {
+        if (!existingIds.has(r.id)) {
+          existing.unshift(r);
+          added++;
+        }
+      }
+      saveRecords(existing);
+      toast(`📤 成功导入 ${added} 条新记录（跳过了 ${data.length - added} 条重复记录）`);
+      updateStats();
+      renderRecords();
+    } catch (err) {
+      toast('❌ 导入失败：文件格式不正确', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ==================== TABS ====================
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'form' && i === 0) || (tab === 'records' && i === 1));
+  });
+  document.getElementById('tab-form').style.display = tab === 'form' ? 'block' : 'none';
+  document.getElementById('tab-records').style.display = tab === 'records' ? 'block' : 'none';
+  if (tab === 'records') {
+    updateStats();
+    renderRecords();
+  }
+}
+
+// ==================== UTILS ====================
+function esc(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '-';
+  return new Date(iso).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' });
+}
+
+function fmtDateTime(iso) {
+  if (!iso) return '-';
+  return new Date(iso).toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+// ==================== INIT ====================
+function init() {
+  // Set default date to today
+  document.getElementById('visitDate').value = new Date().toISOString().slice(0, 10);
+  updateStats();
+}
+
+init();
+</script>
+
+</body>
+</html>
