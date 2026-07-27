@@ -1,0 +1,2 @@
+# 接待流程管理系统 - Python 依赖
+# 本项目仅使用 Python 标准库，此文件供 Render.com 自动检测 Python 项目
