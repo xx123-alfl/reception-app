@@ -964,56 +964,56 @@ function printRecord(id) {
 
 // ==================== WORD EXPORT ====================
 function buildWordHTML(r) {
-  const statusLabels = { draft: '草稿', submitted: '已提交', reviewed: '已审核' };
-  return `<!DOCTYPE html>
+      const weekDays = ['日','一','二','三','四','五','六'];
+      let weekDay = '';
+      const dateStr = r.visitDate || '';
+      if (dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        weekDay = '星期' + weekDays[d.getDay()];
+      }
+      const now = new Date();
+      const ampm = now.getHours() < 12 ? '上' : '下';
+      const purposesText = (r.purposes||[]).map((p, i) => `${i+1}　${p}`).join('；<br>');
+      const agendaText = (r.agenda || '（待补充）').replace(/\n/g, '<br>');
+
+      return `<!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><title>接待流程方案</title>
+<head><meta charset="UTF-8"><title>公务接待活动通知</title>
 <style>
-  body { font-family: "SimSun", "宋体", serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 2; color: #000; }
-  h1 { text-align: center; font-size: 22px; margin-bottom: 30px; letter-spacing: 2px; }
-  .info { margin-bottom: 20px; }
-  .info-row { display: flex; border-bottom: 1px solid #ccc; padding: 8px 0; font-size: 15px; }
-  .info-label { width: 180px; font-weight: bold; flex-shrink: 0; }
-  .info-value { flex: 1; }
-  .section { margin-top: 24px; }
-  .section-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; border-left: 4px solid #1a56db; padding-left: 10px; }
-  .agenda-box { background: #f9fafb; padding: 16px; border: 1px solid #e5e7eb; white-space: pre-wrap; font-size: 14px; }
-  .footer { margin-top: 40px; display: flex; justify-content: space-between; }
-  .footer div { text-align: center; }
-  .footer .line { display: inline-block; width: 120px; border-bottom: 1px solid #000; margin-bottom: 6px; }
-  @media print { body { margin: 20px; } }
+  @page { size: A4; margin: 2.54cm 3.18cm 2.54cm 3.18cm; }
+  body {
+    font-family: "KaiTi", "楷体", "STKaiti", "SimKai", serif;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 2;
+    color: #000;
+    font-size: 12pt;
+  }
+  h1 { text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 24px; }
+  .section-title { font-weight: bold; margin-top: 18px; margin-bottom: 4px; }
+  .indent { text-indent: 2em; }
+  @media print { body { margin: 0; padding: 0 40px; } }
 </style></head>
 <body>
-  <h1>接 待 流 程 方 案</h1>
-  <div class="info">
-    <div class="info-row"><div class="info-label">A. 来访单位 / 推荐单位：</div><div class="info-value">${esc(r.visitingUnit)}</div></div>
-    <div class="info-row"><div class="info-label">B. 来访人员最高职级：</div><div class="info-value">${esc(r.highestRank)}</div></div>
-    <div class="info-row"><div class="info-label">C. 带队领导：</div><div class="info-value">${esc(r.teamLeader)}</div></div>
-    <div class="info-row"><div class="info-label">团队人数：</div><div class="info-value">${r.teamSize} 人</div></div>
-    <div class="info-row"><div class="info-label">D. 来访目的：</div><div class="info-value">${(r.purposes||[]).join('、')}</div></div>
-    <div class="info-row"><div class="info-label">计划来访日期：</div><div class="info-value">${r.visitDate || '（待定）'}</div></div>
-    <div class="info-row"><div class="info-label">我方接待负责人：</div><div class="info-value">${esc(r.receptionHost)}</div></div>
-  </div>
-  ${r.agenda ? `
-  <div class="section">
-    <div class="section-title">接待议程安排</div>
-    <div class="agenda-box">${esc(r.agenda)}</div>
-  </div>` : ''}
-  ${r.notes ? `
-  <div class="section">
-    <div class="section-title">备注</div>
-    <p>${esc(r.notes)}</p>
-  </div>` : ''}
-  <div class="footer">
-    <div><div class="line"></div><div>经办人</div></div>
-    <div><div class="line"></div><div>审核人</div></div>
-    <div><div class="line"></div><div>批准人</div></div>
-  </div>
-  <p style="text-align:center;color:#999;margin-top:30px;font-size:12px;">生成时间：${fmtDateTime(new Date().toISOString())} &nbsp;|&nbsp; 状态：${statusLabels[r.status] || r.status}</p>
+  <h1>公务接待活动通知</h1>
+  <p>各位同事 ${ampm}午好！</p>
+  <p class="section-title">【事由】</p>
+  <p class="indent">${esc(r.visitingUnit)}安排"${esc(r.teamLeader)}${esc(r.highestRank)}一行"来我司参访交流，由${esc(r.highestRank)}${esc(r.teamLeader)}带队，共${r.teamSize}人。</p>
+  <p class="section-title">【时间地点】</p>
+  <p class="indent">时间：${dateStr || '（待定）'}（${weekDay}）</p>
+  <p class="indent">地点：</p>
+  <p class="section-title">【议程】</p>
+  <p class="indent">${agendaText}</p>
+  <p class="section-title">【来访目的】</p>
+  <p class="indent">${purposesText || '（待补充）'}</p>
+  <p class="section-title">【分工安排】</p>
+  <p class="indent">接待负责人：${esc(r.receptionHost)}</p>
+  ${r.notes ? `<p class="indent">备注：${esc(r.notes)}</p>` : ''}
 </body></html>`;
-}
+    }
 
-function exportWord(id) {
+function exportWord(id) {function exportWord(id) {
   const records = getRecords();
   const r = records.find(r => r.id === id);
   if (!r) return;
