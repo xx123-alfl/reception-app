@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: reception-app
+    runtime: python
+    buildCommand: ""
+    startCommand: python3 server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: RENDER_DATA_DIR
+        value: /data
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    plan: free
